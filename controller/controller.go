@@ -8,27 +8,33 @@ import (
 )
 
 var(
-	searchImageEndpoint = "/search"
-	startContainerEndpoint = "/start"
-	stopContainerEndpoint = "/stop"
-	resetContainerEndpoint = "/reset"
+	listContainerPath = "/list"
+	searchImagePath = "/search"
+	startContainerPath = "/start"
+	stopContainerPath = "/stop"
+	resetContainerPath = "/reset"
 )
 
 func Init(){
+	fmt.Println("Initializing controller ...")
 	main()
 }
 
-func main() {
-	http.HandleFunc(searchImageEndpoint, search)
-	http.HandleFunc(startContainerEndpoint, start)
-	http.HandleFunc(stopContainerEndpoint, stop)
-	http.HandleFunc(resetContainerEndpoint, reset)
+func main()  {
+	http.HandleFunc(listContainerPath, list)
+	http.HandleFunc(searchImagePath, search)
+	http.HandleFunc(startContainerPath, start)
+	http.HandleFunc(stopContainerPath, stop)
+	http.HandleFunc(resetContainerPath, reset)
 
-	
-	
     if err := http.ListenAndServe(":8081", nil); err != nil {
-        log.Fatal(err)
-    }
+		log.Fatal(err)
+	}
+}
+
+func list(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "list Command was called")
+	cmdmanager.List()
 }
 
 func search(w http.ResponseWriter, r *http.Request) {

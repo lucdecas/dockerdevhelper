@@ -1,22 +1,34 @@
 package cmdmanager
 
-import (
-	"fmt"
-	"os/exec"
-)
+import "fmt"
+import "os/exec"
+import "strings"
 
 var(
-	d = "docker" 
-	s = "search"
-	r = "run"
-	filter = "--filter is-official=true --limit 1"
+	searchCmd = "docker search --filter is-official=true --limit 1 --format '{{.Name}}'"
+	listCmd = "docker ps --format '{{.Image}}/{{.ID}}'"
 )
 
 func Search(str string){
-	cmd := exec.Command("docker", "ps")
-	fmt.Printf("Running command and waiting for it to finish...", cmd)
-	err := cmd.Run()
-	fmt.Printf("Command finished with error: %v", err)
+	searchCmd := searchCmd+ " "+str
+	cmd := createCommand(searchCmd)
+	out, err := cmd.Output()
+	if err != nil {
+		// TODO: handle error more gracefully
+		fmt.Println(err)
+	}
+	fmt.Println(string(out))
+}
+
+func List() {
+	cmd := createCommand(listCmd)
+	out, err := cmd.Output()
+	containers := strings.Fields(string(out))
+	if err != nil {
+		// TODO: handle error more gracefully
+		fmt.Println(err)
+	}
+	fmt.Println(containers)
 }
 
 func Start(str string){
@@ -32,4 +44,12 @@ func Stop(str string){
 func Reset(str string){
 	fmt.Println(str)
 	fmt.Println("Reset command issued")
+}
+
+func createCommand(str string) *exec.Cmd{
+	cmd := strings.Fields(str)
+	if len(cmd) < 2{
+		fmt.Println("Invalid command")
+	}
+	return exec.Command(cmd[0], cmd[1:]...)
 }
